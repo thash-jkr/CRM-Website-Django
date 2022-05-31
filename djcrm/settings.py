@@ -1,17 +1,19 @@
 from pathlib import Path
-import os
 import environ
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 
-env = environ.Env()
-
-# read th .env file
-environ.Env.read_env(env_file=str(BASE_DIR) + '/.env')    
-
-SECRET_KEY = env('SECRET_KEY')
+READ_DOT_ENV_FILE = env.bool('READ_DOT_ENV_FILE', default=False)
+if READ_DOT_ENV_FILE:
+    environ.Env.read_env()
 
 DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = ['*']
 
@@ -67,8 +69,12 @@ WSGI_APPLICATION = 'djcrm.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
     }
 }
 
